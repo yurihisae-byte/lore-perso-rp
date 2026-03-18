@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Candidature — [NOM DU PERSO]</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&family=Cinzel:wght@600;900&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { font-family:'Nunito',sans-serif; min-height:100vh; color:#e8eaf6; overflow-x:hidden; }
+
+#bg-canvas { position:fixed; inset:0; z-index:0; pointer-events:none; }
+
+.wrapper { position:relative; z-index:2; max-width:900px; margin:0 auto; padding:3rem 1.5rem 5rem; }
+
+/* HEADER */
+.header { text-align:center; margin-bottom:2.5rem; }
+.header-name { font-family:'Cinzel',serif; font-weight:900; font-size:clamp(1.4rem,4vw,2.8rem); letter-spacing:0.1em; color:#fff; text-shadow:0 0 40px rgba(150,150,255,0.3); margin-bottom:0.4rem; }
+.header-name .clan { color:var(--accent,#a0a0ff); }
+.header-quote { font-size:0.9rem; color:rgba(220,220,255,0.4); font-style:italic; }
+
+/* MUSIC SELECT */
+.music-select{
+  font-family:'Cinzel',serif;
+  font-size:0.7rem;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  padding:0.6em 1em;
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,0.1);
+  background:rgba(255,255,255,0.05);
+  color:#fff;
+  backdrop-filter:blur(10px);
+  cursor:pointer;
+}
+
+.music-select option{
+  background:#111;
+}
+
+/* MUSIC BUTTON */
+.music-btn{
+  font-family:'Cinzel',serif;
+  font-size:0.75rem;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  padding:0.8em 1.6em;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.1);
+  background:rgba(255,255,255,0.05);
+  color:#fff;
+  cursor:pointer;
+  backdrop-filter:blur(10px);
+  transition:all 0.3s ease;
+}
+
+.music-btn:disabled{
+  opacity:0.4;
+  cursor:not-allowed;
+}
+
+.music-btn:hover{
+  background:rgba(255,255,255,0.1);
+  transform:translateY(-2px);
+}
+
+.music-btn.playing{
+  background:rgba(255,255,255,0.15);
+  color:var(--accent,#a0a0ff);
+  box-shadow:0 0 15px rgba(255,255,255,0.1);
+}
+/* MUSIC BUTTON */
+.music-btn{
+  font-family:'Cinzel',serif;
+  font-size:0.75rem;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  padding:0.8em 1.6em;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.1);
+  background:rgba(255,255,255,0.05);
+  color:#fff;
+  cursor:pointer;
+  backdrop-filter:blur(10px);
+  transition:all 0.3s ease;
+}
+
+.music-btn:hover{
+  background:rgba(255,255,255,0.1);
+  transform:translateY(-2px);
+}
+
+.music-btn.playing{
+  background:rgba(255,255,255,0.15);
+  color:var(--accent,#a0a0ff);
+  box-shadow:0 0 15px rgba(255,255,255,0.1);
+}
+/* TABS */
+.tabs { display:flex; flex-wrap:wrap; gap:0.4rem; background:rgba(0,0,0,0.25); border-radius:12px; padding:0.5rem; margin-bottom:2rem; backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.07); }
+.tab-btn { flex:1; min-width:90px; padding:0.6rem 0.8rem; background:transparent; border:none; border-radius:8px; font-family:'Nunito',sans-serif; font-size:0.82rem; font-weight:700; color:rgba(220,220,255,0.45); cursor:pointer; transition:all 0.3s; white-space:nowrap; text-align:center; }
+.tab-btn:hover { color:rgba(220,220,255,0.75); background:rgba(255,255,255,0.05); }
+.tab-btn.active { background:rgba(255,255,255,0.12); color:#fff; box-shadow:0 2px 12px rgba(0,0,0,0.3); }
+
+/* PANELS */
+.panel { display:none; animation:panelIn 0.4s ease; }
+.panel.active { display:block; }
+@keyframes panelIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+/* SECTION CARD */
+.section-card { background:rgba(15,10,30,0.55); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:2rem; backdrop-filter:blur(12px); margin-bottom:1.2rem; }
+.section-card-title { font-size:1.1rem; font-weight:800; color:#fff; margin-bottom:1.5rem; display:flex; align-items:center; gap:0.6rem; }
+
+/* INFO GRID */
+.info-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.8rem; }
+@media(max-width:550px){ .info-grid{grid-template-columns:1fr;} }
+.info-box { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:1rem 1.2rem; }
+.info-box.wide { grid-column:1/-1; }
+.info-label { font-size:0.65rem; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:rgba(220,220,255,0.4); margin-bottom:0.4rem; display:block; }
+.info-val { font-size:1rem; font-weight:700; color:#fff; }
+.info-val.accent { color:var(--accent,#a0a0ff); }
+.info-val.check::before { content:'✓ '; color:var(--accent,#a0a0ff); }
+
+/* LORE */
+.lore-p { font-size:1rem; color:rgba(220,220,255,0.65); line-height:1.95; margin-bottom:1.2rem; }
+.lore-p:last-child { margin-bottom:0; }
+.lore-sep { display:flex; align-items:center; gap:1rem; margin:1.2rem 0; }
+.lore-sep::before,.lore-sep::after { content:''; flex:1; height:1px; background:rgba(255,255,255,0.08); }
+.lore-sep span { color:rgba(220,220,255,0.2); font-size:0.7rem; }
+
+/* OBJECTIFS */
+.obj-item { display:flex; gap:1.2rem; align-items:flex-start; padding:1.2rem 0; border-bottom:1px solid rgba(255,255,255,0.05); }
+.obj-item:last-child { border-bottom:none; }
+.obj-num { font-family:'Cinzel',serif; font-size:1.6rem; font-weight:900; color:rgba(255,255,255,0.08); min-width:40px; line-height:1; }
+.obj-title { font-size:0.8rem; font-weight:800; letter-spacing:2px; text-transform:uppercase; color:rgba(220,220,255,0.7); margin-bottom:0.4rem; display:block; }
+.obj-desc { font-size:0.95rem; color:rgba(220,220,255,0.45); line-height:1.75; }
+
+/* XP */
+.xp-item { display:flex; align-items:center; gap:1rem; padding:0.8rem 0; border-bottom:1px solid rgba(255,255,255,0.05); font-size:0.95rem; color:rgba(220,220,255,0.6); font-weight:600; }
+.xp-item:last-child { border-bottom:none; }
+.xp-dot { width:6px; height:6px; border-radius:50%; background:var(--accent,#a0a0ff); opacity:0.5; flex-shrink:0; }
+
+/* MOTIVATIONS */
+.motiv-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:0.8rem; }
+@media(max-width:600px){ .motiv-grid{grid-template-columns:1fr;} }
+.motiv-card { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:1.3rem 1rem; text-align:center; transition:transform 0.3s,background 0.3s; }
+.motiv-card:hover { transform:translateY(-4px); background:rgba(255,255,255,0.09); }
+.motiv-ico { font-size:1.8rem; display:block; margin-bottom:0.6rem; }
+.motiv-t { font-size:0.7rem; font-weight:800; letter-spacing:2px; text-transform:uppercase; color:rgba(220,220,255,0.6); display:block; margin-bottom:0.5rem; }
+.motiv-d { font-size:0.88rem; color:rgba(220,220,255,0.4); line-height:1.7; }
+
+/* COLOR SWITCHER */
+.color-switcher { position:fixed; bottom:2rem; right:2rem; z-index:100; display:flex; flex-direction:column; gap:0.5rem; align-items:center; }
+.switcher-label { font-family:'Cinzel',serif; font-size:0.38rem; letter-spacing:3px; color:rgba(255,255,255,0.2); text-transform:uppercase; margin-bottom:0.3rem; writing-mode:vertical-rl; }
+.color-dot { width:14px; height:14px; border-radius:50%; cursor:pointer; border:2px solid rgba(255,255,255,0.2); transition:transform 0.2s,border-color 0.2s; }
+.color-dot:hover { transform:scale(1.3); }
+.color-dot.active { border-color:#fff; transform:scale(1.2); }
+
+/* FOOTER */
+.footer { text-align:center; padding-top:2rem; font-family:'Cinzel',serif; font-size:0.5rem; letter-spacing:4px; color:rgba(255,255,255,0.1); text-transform:uppercase; }
+</style>
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+
+<div class="wrapper">
+
+  <!-- ══════════════════════════════════
+       HEADER — modifie le nom et la quote
+  ══════════════════════════════════ -->
+  <div class="header">
+    <div class="header-name">
+      SHION <span class="clan">— RAIKETSU</span>
+    </div>
+    <div class="header-quote">« seul le résultat compte »</div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('hrp',this)">📋 HRP</button>
+    <button class="tab-btn" onclick="switchTab('perso',this)">🧑 Personnage</button>
+    <button class="tab-btn" onclick="switchTab('histoire',this)">📖 Histoire</button>
+    <button class="tab-btn" onclick="switchTab('motiv',this)">💜 Motivations</button>
+    <button class="tab-btn" onclick="switchTab('objectifs',this)">🎯 Objectifs</button>
+    <!-- <button class="tab-btn" onclick="switchTab('xp',this)">⚔️ Expériences</button>
+  </div>
+
+  ══════════════════════════════════
+       ONGLET 1 — HRP
+       Modifie les valeurs entre les balises <div class="info-val">
+  ══════════════════════════════════ -->
+  <div class="panel active" id="panel-hrp">
+    <div class="section-card">
+      <div class="section-card-title">📋 Présentation HRP</div>
+      <div class="info-grid">
+
+        <div class="info-box">
+          <span class="info-label">Prénom</span>
+          <div class="info-val">???</div>
+        </div>
+
+        <div class="info-box">
+          <span class="info-label">Connaissance de l'univers</span>
+          <div class="info-val check accent">Correcte</div>
+        </div>
+
+        <div class="info-box">
+          <span class="info-label">Micro de qualité</span>
+          <div class="info-val check accent">Oui</div>
+        </div>
+
+        <div class="info-box">
+          <span class="info-label">Caractère</span>
+          <div class="info-val">Neutre</div>
+        </div>
+
+        <div class="info-box wide">
+          <span class="info-label">Expérience RP</span>
+          <div class="info-val" style="font-weight:400;font-size:0.95rem;color:rgba(220,220,255,0.65);">
+            j'ai jour a des SCP des manga rp : demon slayer , naruto , one piece , black clover , jujutsu kaisen
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       ONGLET 2 — PERSONNAGE
+  ══════════════════════════════════ -->
+  <div class="panel" id="panel-perso">
+    <div class="section-card">
+      <div class="section-card-title">🧑 Fiche Personnage</div>
+      <div class="info-grid">
+
+        <div class="info-box">
+          <span class="info-label">Nom complet</span>
+          <div class="info-val">Shion RAIKETSU </div>
+        </div>
+
+        <div class="info-box">
+          <span class="info-label">Âge</span>
+          <div class="info-val">15ans</div>
+        </div>
+
+        <div class="info-box">
+          <span class="info-label">Clan</span>
+          <div class="info-val accent">RAIKETSU</div>
+        </div>
+
+        <div class="info-box">
+          <span class="info-label">Poste visé</span>
+          <div class="info-val">Membre</div>
+        </div>
+
+        <div class="info-box">
+          <span class="info-label">Univers / Serveur</span>
+          <div class="info-val">ATG JJK</div>
+        </div>
+
+        <div class="info-box">
+          <span class="info-label">Caractère du perso</span>
+          <div class="info-val">Aucune émotion possible </div>
+        </div>
+
+        <!-- Ajoute autant de info-box que tu veux ici -->
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       ONGLET 3 — HISTOIRE
+       Modifie chaque <p class="lore-p"> avec ton texte
+       Ajoute autant de paragraphes que tu veux
+  ══════════════════════════════════ -->
+<div class="panel" id="panel-histoire">
+    <div class="section-card">
+      <div class="section-card-title">📖 Histoire du Personnage</div>
+
+      <p class="lore-p">Shion Raiketsu est un jeune héritier du clan Raiketsu, porteur du redouté Mugen no Genkaku, une technique d’illusion capable de briser l’esprit de ses ennemis. Dès l’enfance, ses pouvoirs se sont manifestés de manière anormale, bien plus tôt et plus intensément que chez les autres membres du clan.</p>
+
+      <div class="lore-sep"><span>◆</span></div>
+
+      <p class="lore-p">Ses illusions ne se contentent pas de tromper les sens : elles plongent ses adversaires dans leurs peurs, leurs souvenirs et leurs traumatismes les plus profonds. Cependant, Shion ne maîtrise pas encore pleinement cette capacité, et ses illusions peuvent apparaître sans qu’il le veuille, brouillant même sa propre perception de la réalité.</p>
+
+      <div class="lore-sep"><span>◆</span></div>
+
+      <p class="lore-p">À seulement 15 ans, son esprit montre déjà des signes de fracture. Il doute constamment de ce qu’il voit et entend, incapable parfois de distinguer un allié d’un ennemi. Cette instabilité fait de lui un combattant aussi dangereux pour les autres que pour lui-même.</p>
+
+      <div class="lore-sep"><span>◆</span></div>
+
+      <p class="lore-p">Malgré cela, certains voient en lui un potentiel hors norme. Car si Shion parvient un jour à contrôler le Mugen no Genkaku, il pourrait devenir l’un des utilisateurs les plus redoutables de son clan… à condition de ne pas se perdre définitivement dans ses propres illusions.</p>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       ONGLET 4 — MOTIVATIONS
+       3 cartes — modifie l'icône, le titre et le texte
+       Ajoute ou supprime des .motiv-card si besoin
+  ══════════════════════════════════ -->
+  <div class="panel" id="panel-motiv">
+    <div class="section-card">
+      <div class="section-card-title">💜 Motivations</div>
+      <div class="motiv-grid">
+
+        <div class="motiv-card">
+          <span class="motiv-ico">🔥</span><!-- Remplace l'emoji -->
+          <span class="motiv-t">Inscrire son nom</span>
+          <p class="motiv-d">je veut devenir membre du clan et faire vibré mon nom dans tout shibuya</p>
+        </div>
+
+        <div class="motiv-card">
+          <span class="motiv-ico">⚔️</span>
+          <span class="motiv-t">aide</span>
+          <p class="motiv-d">j'aiderais ma famille que si j'ai quelque chose en retour</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       ONGLET 5 — OBJECTIFS
+       Modifie chaque bloc .obj-item
+       Ajoute ou supprime des blocs si besoin
+  ══════════════════════════════════ -->
+  <div class="panel" id="panel-objectifs">
+    <div class="section-card">
+      <div class="section-card-title">🎯 Objectifs RP</div>
+
+      <div class="obj-item">
+        <div class="obj-num">01</div>
+        <div>
+          <span class="obj-title">Court terme</span>
+          <p class="obj-desc">devenir exorciste</p>
+        </div>
+      </div>
+
+      <div class="obj-item">
+        <div class="obj-num">02</div>
+        <div>
+          <span class="obj-title">Moyen terme</span>
+          <p class="obj-desc">maîtriser le Mugen no Genkaku , devenir plus fort</p>
+        </div>
+      </div>
+
+      <div class="obj-item">
+        <div class="obj-num">03</div>
+        <div>
+          <span class="obj-title">Long terme</span>
+          <p class="obj-desc">devenir un grand maître du Mugen no Genkaku , Avoir le Class S</p>
+        </div>
+      </div>
+
+      <div class="obj-item">
+        <div class="obj-num">04</div>
+        <div>
+          <span class="obj-title">Long terme </span>
+          <p class="obj-desc">maitriser le Mugen no Genkaku a 100% sans faille</p>
+        </div>
+      </div>
+
+      <!-- Ajoute d'autres obj-item en copiant un bloc ci-dessus -->
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       ONGLET 6 — EXPÉRIENCES RP
+       Ajoute / supprime des .xp-item selon tes serveurs
+  ══════════════════════════════════ -->
+  <!-- <div class="panel" id="panel-xp">
+    <div class="section-card">
+      <div class="section-card-title">⚔️ Expériences RP</div>
+
+      <div class="xp-item"><div class="xp-dot"></div>[Nom du serveur 1]</div>
+      <div class="xp-item"><div class="xp-dot"></div>[Nom du serveur 2]</div>
+      <div class="xp-item"><div class="xp-dot"></div>[Nom du serveur 3]</div>
+      <div class="xp-item"><div class="xp-dot"></div>[Nom du serveur 4]</div>
+      <div class="xp-item"><div class="xp-dot"></div>[Nom du serveur 5]</div>
+
+      <!-- Copie un .xp-item pour en ajouter -->
+
+    </div>
+  </div>
+
+  <div class="footer">Candidature Officielle · [Nom du Clan] · [Nom du Perso]</div>
+
+</div><!-- end wrapper -->
+
+<!-- ══════════════════════════════════
+     COULEURS — clique sur les ronds pour changer le thème
+     Tu peux aussi ajouter tes propres couleurs dans le tableau "themes"
+══════════════════════════════════ -->
+<div class="color-switcher">
+  <span class="switcher-label">Thème</span>
+  <div class="color-dot active" style="background:#5050cc" onclick="setTheme(0)" title="Violet"></div>
+  <div class="color-dot" style="background:#2d6a2d" onclick="setTheme(1)" title="Vert"></div>
+  <div class="color-dot" style="background:#1a2a5a" onclick="setTheme(2)" title="Bleu"></div>
+  <div class="color-dot" style="background:#5a1a1a" onclick="setTheme(3)" title="Rouge"></div>
+  <div class="color-dot" style="background:#1a4a4a" onclick="setTheme(4)" title="Cyan"></div>
+  <div class="color-dot" style="background:#5a3a10" onclick="setTheme(5)" title="Or"></div>
+</div>
+
+<div id="volume-container" style="position:fixed;left:2vw;top:18vh;z-index:10;display:flex;flex-direction:column;align-items:center;">
+  <input type="range" id="volume-bar" min="0" max="100" value="50" style="height:180px;width:18px;writing-mode:bt-lr;-webkit-appearance:slider-vertical;appearance:slider-vertical;background:rgba(80,80,200,0.15);">
+  <span id="volume-label" style="color:#a0a0ff;font-size:0.95em;margin-top:0.5em;">Volume : 50%</span>
+</div>
+
+<div style="text-align:center;margin-top:1.5rem;display:flex;flex-direction:column;align-items:center;gap:0.7rem;">
+
+  <audio id="musique" loop></audio>
+
+  <!-- SELECT MUSIQUE -->
+  <select id="music-select" class="music-select">
+    <option value="">Choisit une musique</option>
+    <option value="[JJK] Death Penalty.mp3">Death Penalty</option>
+    <option value="[YN] Dream lantern.mp3">Dream lantern</option>
+    <option value="[IE] Holy Ground.mp3">Holy Ground</option>
+  </select>
+
+  <!-- BOUTON -->
+  <button id="play-music" class="music-btn" disabled>
+    ▶ Lancer la musique
+  </button>
+
+</div>
+
+<script>
+// ═══ TABS ═══
+function switchTab(id, btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ═══ THEMES ═══
+// Pour ajouter ta propre couleur : copie un objet et change les valeurs RGB
+// r, g, b = couleur principale (0-255)
+const themes = [
+  { r:80,  g:80,  b:200, name:'Violet' },   // 0
+  { r:40,  g:160, b:40,  name:'Vert'   },   // 1
+  { r:40,  g:80,  b:200, name:'Bleu'   },   // 2
+  { r:200, g:40,  b:40,  name:'Rouge'  },   // 3
+  { r:20,  g:180, b:180, name:'Cyan'   },   // 4
+  { r:200, g:150, b:20,  name:'Or'     },   // 5
+];
+
+let currentTheme = 0;
+
+function setTheme(i){
+  currentTheme = i;
+  document.querySelectorAll('.color-dot').forEach((d,j)=>d.classList.toggle('active',j===i));
+  const {r,g,b} = themes[i];
+  document.documentElement.style.setProperty('--accent', `rgb(${Math.min(r+80,255)},${Math.min(g+80,255)},${Math.min(b+80,255)})`);
+}
+
+// ═══ CANVAS ═══
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let W,H,t=0;
+function resize(){ W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight; }
+resize(); window.addEventListener('resize',resize);
+
+function rand(a,b){ return Math.random()*(b-a)+a; }
+
+class Particle{
+  constructor(){ this.reset(true); }
+  reset(init){
+    this.x=rand(0,W); this.y=init?rand(0,H):H+5;
+    this.s=rand(0.5,2.2); this.sy=-(rand(0.1,0.45)); this.sx=rand(-0.08,0.08);
+    this.a=rand(0.05,0.18); this.life=1; this.decay=rand(0.0004,0.001);
+  }
+  update(){ this.x+=this.sx; this.y+=this.sy; this.life-=this.decay; if(this.y<-5||this.life<=0)this.reset(false); }
+  draw(){
+    const {r,g,b}=themes[currentTheme];
+    ctx.beginPath(); ctx.arc(this.x,this.y,this.s,0,Math.PI*2);
+    ctx.fillStyle=`rgba(${r},${g},${b},${this.a*this.life})`; ctx.fill();
+  }
+}
+
+class Wave{
+  constructor(o){ Object.assign(this,o); this.off=rand(0,Math.PI*2); }
+  draw(t){
+    const {r,g,b}=themes[currentTheme];
+    ctx.beginPath();
+    const yb=this.yf*H; ctx.moveTo(0,yb);
+    for(let x=0;x<=W;x+=4){
+      const y=yb+Math.sin(x*this.f1+t*this.s1+this.off)*this.a1+Math.sin(x*this.f2+t*this.s2)*this.a2;
+      ctx.lineTo(x,y);
+    }
+    ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath();
+    ctx.fillStyle=`rgba(${r},${g},${b},${this.op})`; ctx.fill();
+  }
+}
+
+const waves=[
+  new Wave({yf:0.88,f1:0.009,f2:0.016,a1:14,a2:7,s1:0.4,s2:0.7,op:0.03}),
+  new Wave({yf:0.93,f1:0.011,f2:0.02, a1:11,a2:5,s1:0.6,s2:0.5,op:0.045}),
+  new Wave({yf:0.97,f1:0.013,f2:0.022,a1:8, a2:4,s1:0.8,s2:1.0,op:0.065}),
+];
+
+const parts=Array.from({length:100},()=>new Particle());
+
+function animate(){
+  t+=0.008;
+  const {r,g,b}=themes[currentTheme];
+  ctx.clearRect(0,0,W,H);
+  const g2=ctx.createLinearGradient(0,0,W,H);
+  g2.addColorStop(0,`rgba(${Math.round(r*0.12)},${Math.round(g*0.12)},${Math.round(b*0.12)},1)`);
+  g2.addColorStop(1,`rgba(${Math.round(r*0.04)},${Math.round(g*0.04)},${Math.round(b*0.04)},1)`);
+  ctx.fillStyle=g2; ctx.fillRect(0,0,W,H);
+  waves.forEach(w=>w.draw(t));
+  parts.forEach(p=>{p.update();p.draw();});
+  requestAnimationFrame(animate);
+}
+animate();
+setTheme(0);
+// ═══ MUSIQUE AVEC CHOIX ═══
+const audio = document.getElementById("musique");
+const btn = document.getElementById("play-music");
+const select = document.getElementById("music-select");
+const volumeBar = document.getElementById("volume-bar");
+const volumeLabel = document.getElementById("volume-label");
+
+let isPlaying = false;
+
+// sélection musique
+select.addEventListener("change", () => {
+  audio.src = select.value;
+  btn.disabled = !select.value;
+
+  if(isPlaying){
+    audio.play();
+  }
+});
+
+// bouton play / pause
+btn.addEventListener("click", () => {
+  if(!audio.src) return;
+
+  if(!isPlaying){
+    audio.play();
+    btn.textContent = "❚❚ Pause";
+    btn.classList.add("playing");
+  }else{
+    audio.pause();
+    btn.textContent = "▶ Lancer la musique";
+    btn.classList.remove("playing");
+  }
+
+  isPlaying = !isPlaying;
+});
+
+// volume
+volumeBar.addEventListener("input", () => {
+  const vol = volumeBar.value / 100;
+  audio.volume = vol;
+  volumeLabel.textContent = "Volume : " + volumeBar.value + "%";
+});
+
+// volume initial
+audio.volume = 0.5;
+</script>
+</body>
+</html>
